@@ -1,0 +1,26 @@
+# Core dependencies for MyMedicalGPT
+# Install: pip install -r requirements.txt
+
+# Deep Learning Framework
+torch>=2.0.0
+transformers>=4.49.0
+
+# Training & Fine-tuning
+accelerate>=0.20.0
+peft>=0.14.0
+trl>=0.15.2
+
+# Data Processing
+datasets>=2.14.6
+sentencepiece
+
+# Utilities
+loguru
+tqdm>=4.47.0
+tensorboard
+scikit-learn
+
+# Optional: for quantization (uncomment if needed)
+# bitsandbytes
+# optimum
+# auto-gptq
