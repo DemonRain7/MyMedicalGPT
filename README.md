@@ -16,6 +16,7 @@ MyMedicalGPT/
 ├── inference.py                # 基础推理
 ├── inference_api.py            # API推理服务
 ├── inference_gradio.py         # Gradio Web界面
+├── inference_vllm.py           # vLLM高性能推理
 ├── scripts/                    # 训练脚本
 │   ├── train_pt.sh            # 预训练
 │   ├── train_sft.sh           # SFT微调
@@ -23,7 +24,8 @@ MyMedicalGPT/
 │   ├── merge_lora.sh          # 合并LoRA
 │   ├── run_pipeline.sh        # 完整流程
 │   ├── inference_basic.sh     # 基础推理
-│   └── inference_batch.sh     # 批量推理
+│   ├── inference_batch.sh     # 批量推理
+│   └── serve_vllm.sh          # vLLM服务
 ├── data/                       # 数据目录
 │   ├── pretrain/              # 预训练数据(.txt)
 │   ├── finetune/              # SFT数据(.jsonl)
@@ -141,6 +143,60 @@ python inference.py \
     --base_model merged-dpo \
     --data_file queries.jsonl \
     --output_file predictions.jsonl
+```
+
+### 方式5: vLLM 高性能推理 (推荐生产环境)
+
+vLLM 提供 10-20x 的吞吐量提升，适合生产部署。
+
+```bash
+# 安装 vLLM (需要 Linux + NVIDIA GPU)
+pip install vllm
+
+# 方式A: 交互式对话
+python inference_vllm.py --model_path merged-dpo --interactive
+
+# 方式B: 启动 OpenAI 兼容 API 服务
+python inference_vllm.py --model_path merged-dpo --serve --port 8000
+
+# 方式C: 批量推理
+python inference_vllm.py \
+    --model_path merged-dpo \
+    --data_file queries.jsonl \
+    --output_file vllm_output.jsonl
+```
+
+**调用 vLLM API 服务:**
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:8000/v1",
+    api_key="EMPTY"
+)
+
+response = client.chat.completions.create(
+    model="merged-dpo",
+    messages=[{"role": "user", "content": "你好"}]
+)
+print(response.choices[0].message.content)
+```
+
+**vLLM 高级配置:**
+
+```bash
+# 多卡并行
+python inference_vllm.py --model_path merged-dpo --serve \
+    --tensor_parallel_size 2
+
+# AWQ 量化
+python inference_vllm.py --model_path merged-dpo --serve \
+    --quantization awq
+
+# 调整显存使用
+python inference_vllm.py --model_path merged-dpo --serve \
+    --gpu_memory_utilization 0.8
 ```
 
 ## ⚙️ 训练参数说明

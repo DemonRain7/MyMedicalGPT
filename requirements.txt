@@ -20,7 +20,21 @@ tqdm>=4.47.0
 tensorboard
 scikit-learn
 
-# Optional: for quantization (uncomment if needed)
+# Inference API
+fastapi
+uvicorn
+pydantic
+
+# Optional: Web UI (uncomment if needed)
+# gradio
+
+# Optional: Quantization (uncomment if needed)
 # bitsandbytes
 # optimum
 # auto-gptq
+
+# Optional: High-performance inference with vLLM (Linux + NVIDIA GPU required)
+# vllm
+
+# Optional: OpenAI SDK for vLLM client
+# openai
